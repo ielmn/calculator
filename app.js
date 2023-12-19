@@ -10,25 +10,27 @@ let a, b, op, result;
 const nextNum = [];
 
 function operate( a, op, b){
-
+    let ans = null;
     switch(op) {
         case '+': 
-            result = a + b;
+            ans = a + b;
             break;
         case '-': 
-            result = a - b;
+            ans = a - b;
             break;
         case '×':
-            result = a * b;
+            ans = a * b;
             break;
         case '÷':
-            result = a / b;
+            ans = a / b;
             break;
         case '%':
-            result = a % b;
+            ans = a % b;
             break;
         default: return 'error'
     }
+
+    result = Math.round((ans + Number.EPSILON)*100)/100;
     current.textContent = `${result}`;
     recent.textContent = `${a} ${op} ${b} =`
 }
@@ -38,10 +40,15 @@ function isEmpty(val){
 }
 
 function handleNum(str) {
+    if(!isEmpty(result) && isEmpty(op)) {
+        clearAll();
+    }
     if(current.textContent === '0') current.textContent = '';
+
     if(isEmpty(op)) {
         let entry = current.textContent += str;
         a = +entry;
+
     }else if(!isEmpty(op)) {
         current.textContent += str;
         nextNum.push(str)
@@ -51,14 +58,25 @@ function handleNum(str) {
 
 function handleOperator(str) {
     if((isEmpty(a)) || current.textContent.endsWith(op)) return;
-    // if(!isEmpty(a) && !isEmpty(b)){
-    //     operate(a, op, b);
-    // }
+    if(!isEmpty(b)){
+        calculate();
+    }
     if(!isEmpty(a) || !isEmpty(b)){
         current.textContent += str;
         op = str;
-        console.log("a=", a, op, "b=", b )
     }
+}
+
+function calculate() {
+    operate(a, op, b);
+    console.log("a=", a, op, "b= ", b ," =", result )
+    a = result; b = null; op = null; nextNum.length = 0;
+}
+
+function clearAll() {
+    recent.textContent = "";
+    current.textContent = "0";
+    a = ""; b = ""; op = undefined; result = "";nextNum.length = 0;
 }
 
 // -----------          EVENT LISTENERS      ---------------//
@@ -73,15 +91,11 @@ opButtons.forEach(button => {
 )
 
 clear.onclick = function(){
-    recent.textContent = "";
-    current.textContent = "0";
-    a = ""; b = ""; op = undefined; result = "";nextNum.length = 0;
+    clearAll();
 }
 
 equals.onclick = () => {
     if(isEmpty(a)|| isEmpty(b) || isEmpty(op)) return
-    operate(a, op, b);
-    a = result;
-    b;
-    nextNum.length = 0;
+    calculate()
 }
+
