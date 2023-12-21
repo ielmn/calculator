@@ -8,6 +8,7 @@ const equals = document.querySelector('#equals');
 
 let a = 0, b, op, result;
 const nextNum = [];
+const opList = ['+','×','-','÷','%'];
 
 function operate( a, op, b){
     let ans = null;
@@ -22,6 +23,7 @@ function operate( a, op, b){
             ans = a * b;
             break;
         case '÷':
+            if((b == 0)) return current.textContent ='bruh';
             ans = a / b;
             break;
         case '%':
@@ -40,10 +42,10 @@ function isEmpty(val){
 }
 
 function handleNum(str) {
-    if(!isEmpty(result) && isEmpty(op)) {
+    if(!isEmpty(result) && isEmpty(op)
+    || current.textContent == 'bruh') {
         clearAll();
     }
-
     if(current.textContent === '0' && str !== '.') current.textContent = '';
 
     if(isEmpty(op)) {
@@ -55,12 +57,11 @@ function handleNum(str) {
         nextNum.push(str)
         b = +nextNum.join('');
     }
-    console.log(a)
 }
 
 function handleOperator(str) {
     if((isEmpty(a)) || current.textContent.endsWith(op) || current.textContent.endsWith('.')) return;
-    if(!isEmpty(b)){
+    if(!isEmpty(b) && !isEmpty(op)){
         calculate();
     }
     if(!isEmpty(a) || !isEmpty(b)){
@@ -81,6 +82,22 @@ function clearAll() {
     a = 0; b = ""; op = undefined; result = "";nextNum.length = 0;
 }
 
+function deleteNumber() {
+    if(opList.some(o => current.textContent.endsWith(o))){
+        current.textContent = current.textContent.slice(0, -1)
+        op = undefined;
+    }
+    else if(opList.some(o => current.textContent.includes(o))){
+        current.textContent = current.textContent.slice(0, -1)
+        nextNum.splice(-1)
+        b = +nextNum.join('');
+    }
+    else if(isEmpty(op)){
+        current.textContent = current.textContent.slice(0, -1);
+        a = +current.textContent;
+        if(current.textContent == "") clearAll();
+    }
+  }
 // -----------          EVENT LISTENERS      ---------------//
 numButtons.forEach(button => {
     button.addEventListener('click', function () {
@@ -109,4 +126,9 @@ clear.onclick = function(){
 equals.onclick = () => {
     if(isEmpty(a)|| isEmpty(b) || isEmpty(op)) return
     calculate();
+}
+
+delBtn.onclick = () => {
+    if(current.textContent == '0') return;
+    deleteNumber();
 }
