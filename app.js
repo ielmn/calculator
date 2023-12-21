@@ -6,7 +6,7 @@ const clear = document.querySelector('#clear');
 const delBtn = document.querySelector('#delete');
 const equals = document.querySelector('#equals');
 
-let a, b, op, result;
+let a = 0, b, op, result;
 const nextNum = [];
 
 function operate( a, op, b){
@@ -43,7 +43,8 @@ function handleNum(str) {
     if(!isEmpty(result) && isEmpty(op)) {
         clearAll();
     }
-    if(current.textContent === '0') current.textContent = '';
+
+    if(current.textContent === '0' && str !== '.') current.textContent = '';
 
     if(isEmpty(op)) {
         let entry = current.textContent += str;
@@ -54,10 +55,11 @@ function handleNum(str) {
         nextNum.push(str)
         b = +nextNum.join('');
     }
+    console.log(a)
 }
 
 function handleOperator(str) {
-    if((isEmpty(a)) || current.textContent.endsWith(op)) return;
+    if((isEmpty(a)) || current.textContent.endsWith(op) || current.textContent.endsWith('.')) return;
     if(!isEmpty(b)){
         calculate();
     }
@@ -76,12 +78,22 @@ function calculate() {
 function clearAll() {
     recent.textContent = "";
     current.textContent = "0";
-    a = ""; b = ""; op = undefined; result = "";nextNum.length = 0;
+    a = 0; b = ""; op = undefined; result = "";nextNum.length = 0;
 }
 
 // -----------          EVENT LISTENERS      ---------------//
 numButtons.forEach(button => {
-    button.addEventListener('click', () => handleNum(button.textContent));  
+    button.addEventListener('click', function () {
+        //handle multiple decimals
+        if(button.textContent == '.'){
+            if(!isEmpty(b)){
+                let secondEntry = current.textContent.split(op.toString());
+                if(secondEntry[1].includes('.'))return;
+            }
+            else if(current.textContent.includes('.')) return;
+        }
+        handleNum(button.textContent)
+    });  
     }
 )
 
@@ -96,6 +108,5 @@ clear.onclick = function(){
 
 equals.onclick = () => {
     if(isEmpty(a)|| isEmpty(b) || isEmpty(op)) return
-    calculate()
+    calculate();
 }
-
