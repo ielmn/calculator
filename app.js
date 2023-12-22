@@ -28,6 +28,7 @@ function operate( a, op, b){
             ans = a / b;
             break;
         case '%':
+            if((b == 0 || a == 0)) return current.textContent ='bruh';
             ans = a % b;
             break;
     }
@@ -99,7 +100,6 @@ function deleteNumber() {
         if(current.textContent == "") clearAll();
     }
 }
-
 
 function handleKeyboardInput(e) {
     if (e.key >= 0 && e.key <= 9) handleNum(e.key)
