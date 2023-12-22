@@ -5,6 +5,7 @@ const opButtons = document.querySelectorAll('.operations');
 const clear = document.querySelector('#clear');
 const delBtn = document.querySelector('#delete');
 const equals = document.querySelector('#equals');
+const decimal = document.querySelector('#decimal');
 
 let a = 0, b, op, result;
 const nextNum = [];
@@ -29,7 +30,6 @@ function operate( a, op, b){
         case '%':
             ans = a % b;
             break;
-        default: return 'error'
     }
 
     result = Math.round((ans + Number.EPSILON)*100)/100;
@@ -71,15 +71,16 @@ function handleOperator(str) {
 }
 
 function calculate() {
+    if(isEmpty(a)|| isEmpty(b) || isEmpty(op)) return
     operate(a, op, b);
     console.log("a=", a, op, "b= ", b ," =", result )
-    a = result; b = null; op = null; nextNum.length = 0;
+    a = result; b = undefined; op = undefined; nextNum.length = 0;
 }
 
 function clearAll() {
     recent.textContent = "";
     current.textContent = "0";
-    a = 0; b = ""; op = undefined; result = "";nextNum.length = 0;
+    a = 0; b = undefined; op = undefined; result = "";nextNum.length = 0;
 }
 
 function deleteNumber() {
@@ -97,36 +98,45 @@ function deleteNumber() {
         a = +current.textContent;
         if(current.textContent == "") clearAll();
     }
+}
+
+
+function handleKeyboardInput(e) {
+    if (e.key >= 0 && e.key <= 9) handleNum(e.key)
+    if (e.key === '.') handleDecimal()
+    if (e.key === '=' || e.key === 'Enter') calculate()
+    if (e.key === 'Backspace') deleteNumber()
+    if (e.key === 'Escape') clearAll()
+    if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/' || e.key === '%')
+    handleOperator(convertOp(e.key))
   }
+
+function handleDecimal(){
+    if(!isEmpty(b)){
+        let secondEntry = current.textContent.split(op.toString());
+        if(secondEntry[1].includes('.'))return;
+    }
+    else if(current.textContent.includes('.')) return;
+    handleNum('.');
+}
+
+function convertOp(operator) {
+    if(operator == '/') return '÷';
+    if(operator == '*') return '×';
+    return operator;
+}
 // -----------          EVENT LISTENERS      ---------------//
+clear.onclick = () => clearAll();
+decimal.onclick = () => handleDecimal();
+window.addEventListener('keydown', handleKeyboardInput);
+equals.onclick = () => calculate();
+opButtons.forEach(button => button.addEventListener('click', () => handleOperator(button.textContent)));
+
 numButtons.forEach(button => {
     button.addEventListener('click', function () {
-        //handle multiple decimals
-        if(button.textContent == '.'){
-            if(!isEmpty(b)){
-                let secondEntry = current.textContent.split(op.toString());
-                if(secondEntry[1].includes('.'))return;
-            }
-            else if(current.textContent.includes('.')) return;
-        }
         handleNum(button.textContent)
     });  
-    }
-)
-
-opButtons.forEach(button => {
-    button.addEventListener('click', () => handleOperator(button.textContent));
-    }
-)
-
-clear.onclick = function(){
-    clearAll();
-}
-
-equals.onclick = () => {
-    if(isEmpty(a)|| isEmpty(b) || isEmpty(op)) return
-    calculate();
-}
+})
 
 delBtn.onclick = () => {
     if(current.textContent == '0') return;
