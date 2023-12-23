@@ -9,7 +9,7 @@ const decimal = document.querySelector('#decimal');
 
 let a = 0, b, op, result;
 const nextNum = [];
-const opList = ['+','×','-','÷','%'];
+const opList = ['+','×','-','÷','mod'];
 
 function operate( a, op, b){
     let ans = null;
@@ -27,7 +27,7 @@ function operate( a, op, b){
             if((b == 0)) return current.textContent ='bruh';
             ans = a / b;
             break;
-        case '%':
+        case 'mod':
             if((b == 0 || a == 0)) return current.textContent ='bruh';
             ans = a % b;
             break;
@@ -43,8 +43,7 @@ function isEmpty(val){
 }
 
 function handleNum(str) {
-    if(!isEmpty(result) && isEmpty(op)
-    || current.textContent == 'bruh') {
+    if(!isEmpty(result) && isEmpty(op) || current.textContent == 'bruh') {
         clearAll();
     }
     if(current.textContent === '0' && str !== '.') current.textContent = '';
@@ -74,7 +73,6 @@ function handleOperator(str) {
 function calculate() {
     if(isEmpty(a)|| isEmpty(b) || isEmpty(op)) return
     operate(a, op, b);
-    console.log("a=", a, op, "b= ", b ," =", result )
     a = result; b = undefined; op = undefined; nextNum.length = 0;
 }
 
@@ -85,11 +83,11 @@ function clearAll() {
 }
 
 function deleteNumber() {
-    if(opList.some(o => current.textContent.endsWith(o))){
+    if(opList.some(operator => current.textContent.endsWith(operator))){
         current.textContent = current.textContent.slice(0, -1)
         op = undefined;
     }
-    else if(opList.some(o => current.textContent.includes(o))){
+    else if(opList.some(operator => current.textContent.includes(operator))){
         current.textContent = current.textContent.slice(0, -1)
         nextNum.splice(-1)
         b = +nextNum.join('');
@@ -123,6 +121,7 @@ function handleDecimal(){
 function convertOp(operator) {
     if(operator == '/') return '÷';
     if(operator == '*') return '×';
+    if(operator == '%') return 'mod';
     return operator;
 }
 // -----------          EVENT LISTENERS      ---------------//
